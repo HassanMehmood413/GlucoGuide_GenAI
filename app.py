@@ -20,7 +20,8 @@ def get_meal_plan(api_key, fasting_sugar, pre_meal_sugar, post_meal_sugar, dieta
     language_prompt = f" Please provide the meal plan in {language}."
 
     try:
-        response = client.completion(
+        # Correcting the method to use the 'create' method
+        response = client.completion.create(
             prompt=f"{anthropic.HUMAN_PROMPT} {user_input} {language_prompt} {anthropic.AI_PROMPT}",
             model="claude-2",  # Specify the correct model name here
             max_tokens_to_sample=2000,
