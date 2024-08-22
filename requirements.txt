@@ -1,5 +1,5 @@
-streamlit==1.25.0
-anthropic==0.3.2
-matplotlib==3.8.0
-numpy==1.25.2
-pandas==2.1.0
+streamlit
+anthropic
+matplotlib
+numpy
+pandas
