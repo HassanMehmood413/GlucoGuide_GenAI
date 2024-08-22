@@ -31,10 +31,8 @@ def get_meal_plan(api_key, fasting_sugar, pre_meal_sugar, post_meal_sugar, dieta
         meal_plan = response['completion'].strip()
         return meal_plan
 
-    except anthropic.errors.AnthropicError as e:
-        return f"Error: {e.message}"
     except Exception as e:
-        return f"An unexpected error occurred: {str(e)}"
+        return f"An error occurred: {str(e)}"
 
 # Streamlit UI
 st.title("GlucoGuide")
@@ -75,7 +73,6 @@ with st.sidebar:
                     yval = bar.get_height()
                     ax.text(bar.get_x() + bar.get_width()/2, yval + 1, round(yval, 1), ha='center', va='bottom', fontsize=12, fontweight='bold')
                 st.pyplot(fig)
-
 
                 # Pie Chart
                 st.write("**Pie Chart of Dietary Preferences Distribution:**")
