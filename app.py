@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-def get_meal_plan(api_key, fasting_sugar, pre_meal_sugar, post_meal_sugar, dietary_preferences, age, activity_level):
-    client = anthropic.Anthropic(api_key=api_key)
+def get_meal_plan(api_key, fasting_sugar, pre_meal_sugar, post_meal_sugar, dietary_preferences, age, activity_level, language):
+    client = anthropic.Client(api_key=api_key)
     
     user_input = (
         f"My fasting sugar level is {fasting_sugar}, "
@@ -16,29 +16,23 @@ def get_meal_plan(api_key, fasting_sugar, pre_meal_sugar, post_meal_sugar, dieta
         "Please provide a detailed personalized meal plan."
     )
 
+    # Add language request to the prompt
+    language_prompt = f" Please provide the meal plan in {language}."
+
     try:
-        response = client.messages.create(
-            model="claude-3-5-sonnet-20240620",
-            max_tokens=2000,
-            temperature=0,
-            messages=[
-                {
-                    "role": "user",
-                    "content": user_input
-                }
-            ]
+        response = client.completion(
+            prompt=f"{anthropic.HUMAN_PROMPT} {user_input} {language_prompt} {anthropic.AI_PROMPT}",
+            model="claude-2",  # Specify the correct model name here
+            max_tokens_to_sample=2000,
+            temperature=0
         )
 
-        # Extract and concatenate the content from the response
-        if hasattr(response, 'content') and len(response.content) > 0:
-            text_blocks = response.content
-            meal_plan = ''.join([block.text for block in text_blocks])
-            return meal_plan.strip()
-        else:
-            return "Unexpected response structure. Please check the API documentation."
+        # Extract the meal plan from the response
+        meal_plan = response['completion'].strip()
+        return meal_plan
 
-    except anthropic.BadRequestError as e:
-        return f"Error: {e.error['message']}"
+    except anthropic.errors.AnthropicError as e:
+        return f"Error: {e.message}"
     except Exception as e:
         return f"An unexpected error occurred: {str(e)}"
 
@@ -63,7 +57,7 @@ with st.sidebar:
     if st.button("Get Meal Plan"):
         if api_key:
             with st.spinner("Fetching your personalized meal plan..."):
-                meal_plan = get_meal_plan(api_key, fasting_sugar, pre_meal_sugar, post_meal_sugar, dietary_preferences, age, activity_level)
+                meal_plan = get_meal_plan(api_key, fasting_sugar, pre_meal_sugar, post_meal_sugar, dietary_preferences, age, activity_level, language)
                 st.session_state['meal_plan'] = meal_plan  # Store the meal plan in session state
 
                 # Display health-related graphs
